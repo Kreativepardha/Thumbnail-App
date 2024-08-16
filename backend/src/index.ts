@@ -7,6 +7,7 @@ import { sendEmail } from './config/mail';
 const app:Application = express()
 import './jobs/EmailJobs'
 import { emailQueue, emailQueueName } from './jobs/EmailJobs';
+import { mainRouter } from './routes';
 
 const PORT = process.env.PORT || 3001
 
