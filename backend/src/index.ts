@@ -5,7 +5,8 @@ import { fileURLToPath } from "url";
 import ejs from "ejs";
 import { sendEmail } from './config/mail';
 const app:Application = express()
-
+import './jobs/EmailJobs'
+import { emailQueue, emailQueueName } from './jobs/EmailJobs';
 
 const PORT = process.env.PORT || 3001
 
@@ -24,16 +25,14 @@ app.get("/", async (req:Request, res:Response) =>{
     const html = await ejs.renderFile(__dirname + `/views/emails/welcome.ejs`, {
         name:"PArdha sAradhi",
     })
-    await emailQueue.add(emailQueueName, { to:"hiyope6120@segichen.com" , subject:"Testing qeuee email", html:html})
+    await emailQueue.add(emailQueueName, { to:"hiyope6120@segichen.com" , subject:"Testing qeuee email", body:html})
     return res.json({
         messagae:"Email sent succesfffukly"
     })
 })
 
-//      Queues
+app.use("/api/v1", mainRouter)
 
-import './jobs/EmailJobs'
-import { emailQueue, emailQueueName } from './jobs/EmailJobs';
 
 
 
