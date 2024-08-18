@@ -3,6 +3,8 @@ import { registerSchema } from '../validations/authValidation';
 import Prisma from '../config/database';
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import { ZodError } from 'zod';
+import { formatError } from '../helper';
 
 
 const JWT_SECRET = process.env.JWT_SECRET
@@ -27,11 +29,13 @@ export const register = async (req: Request, res: Response) => {
     
         const hashedPassword = await bcrypt.hash(payload.password, salt)
         
+        const emailToken = await bcrypt.hash(uuidv4(), salt)
+
         const user = await Prisma.user.create({
             data:{
                 name:payload.name,
                 email:payload.email,
-                password:payload.password,
+                password:hashedPassword,
                 // email_verify_token: ,
             }
         })
@@ -42,9 +46,20 @@ export const register = async (req: Request, res: Response) => {
         }, JWT_SECRET as string)
 
 
-        return res.json({ message: "User created successfully!" });
+        return res.json({ 
+            message: "User created successfully!",
+            token:`Bearer ${token}`
+            });
     } catch (err) {
-        return res.status(422).json(err);
+        if(err instanceof ZodError) {
+            const errors = formatError(err)
+            return res.status(422).json({
+                message:"Invalid Data",
+                errors
+            });
+        }
+        return res.status(500).json({ message:"SOmething went wron. internal servcer error"  })
+
     }
 }
 

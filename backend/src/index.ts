@@ -11,7 +11,11 @@ import { mainRouter } from './routes';
 
 const PORT = process.env.PORT || 3001
 
-// const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+// const __dirname = path.resolve();
+// const filePath = path.join(__dirname    );
+// console.log(filePath);
+
 
 
 app.use(express.json())
