@@ -1,19 +1,9 @@
-import express from 'express'
-import { login, register } from '../controllers/authController'
-
-
-const router = express.Router()
-
-router.post("/register",register)
-router.post("/login",login)
-
-// email verfication
 import { Router } from "express";
 import Prisma from "../config/database";
 
 
 
-// const verifyRouter = Router()
+const router = Router()
 
 router.get("/verify-email", async(req, res) => {
     const {email, emailToken} = req.query
@@ -49,11 +39,17 @@ router.get("/verify-error", async (req,res) => {
     return res.render("/auth/verifyEmailError")
 })
 
-// export {
-//     verifyRouter
-// }
 
-//
+
+
+
+
+
+
+
+
+
+
 export {
-    router as authRouter
+    router as verifyRouter
 }

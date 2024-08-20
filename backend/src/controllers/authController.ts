@@ -4,7 +4,9 @@ import Prisma from '../config/database';
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { ZodError } from 'zod';
-import { formatError } from '../helper';
+import { formatError, renderEmailEjs } from '../helper';
+import { emailQueue, emailQueueName } from '../jobs/EmailJobs';
+import {  v4 as uuid4 } from 'uuid'
 
 
 const JWT_SECRET = process.env.JWT_SECRET
@@ -24,31 +26,29 @@ export const register = async (req: Request, res: Response) => {
                 message:"Email Already Taken"
             })
         }
-
         const salt = await bcrypt.genSaltSync(10);
-    
         const hashedPassword = await bcrypt.hash(payload.password, salt)
-        
-        // const emailToken = await bcrypt.hash(uuidv4(), salt)
+        const emailToken = await bcrypt.hash(uuid4(), salt)
+        const url  = `${process.env.CLIENT_APP_URL}/api/v1/auth/verify-email?email=${payload.email}&token=${emailToken}`
+        const emailBody = await renderEmailEjs("email-verify",{name: payload.name, url: url})
+
+        console.log("URL:::", url)
+
+        // *send email
+
+        await emailQueue.add(emailQueueName,{to: payload.email, subject:"Clash email verification", body: emailBody})
 
         const user = await Prisma.user.create({
             data:{
                 name:payload.name,
                 email:payload.email,
                 password:hashedPassword,
-                // email_verify_token: ,
+                email_verify_token: emailToken,
             }
         })
-        
-        const token = jwt.sign({
-            userId:user.id,
-             email: user.email
-        }, JWT_SECRET as string)
-
-
         return res.json({ 
-            message: "User created successfully!",
-            token:`Bearer ${token}`
+            message: "Please check your email , we havesent you a verification email",
+            user: user
             });
     } catch (err) {
         if(err instanceof ZodError) {
@@ -58,15 +58,13 @@ export const register = async (req: Request, res: Response) => {
                 errors
             });
         }
-        return res.status(500).json({ message:"SOmething went wron. internal servcer error"  })
+        return res.status(500).json({ message:"SOmething went wron. internal servcer error" , err })
 
     }
 }
-
 export const login = (req: Request, res: Response) => {
     try {
         const body = req.body;
-        
     } catch (err) {
         return res.status(422).json(err);
     }

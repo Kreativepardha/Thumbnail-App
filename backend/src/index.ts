@@ -3,23 +3,25 @@ import 'dotenv/config'
 import * as path from 'path'
 import { fileURLToPath } from "url";
 import ejs from "ejs";
-import { sendEmail } from './config/mail';
 const app:Application = express()
 import './jobs/EmailJobs'
 import { emailQueue, emailQueueName } from './jobs/EmailJobs';
 import { mainRouter } from './routes';
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3002
 
 
+
+console.log("Database url::", process.env.DATABASE_URL)
 
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(express.json())
 app.use(express.urlencoded({ extended:false }));
+app.use(express.static("public"));
 
 app.set("view engine", "ejs")
-// app.set("views", path.resolve(__dirname, "./views"))
+app.set("views", path.resolve(__dirname, "./views"));
 
 
 
