@@ -29,7 +29,7 @@ export const register = async (req: Request, res: Response) => {
     
         const hashedPassword = await bcrypt.hash(payload.password, salt)
         
-        const emailToken = await bcrypt.hash(uuidv4(), salt)
+        // const emailToken = await bcrypt.hash(uuidv4(), salt)
 
         const user = await Prisma.user.create({
             data:{

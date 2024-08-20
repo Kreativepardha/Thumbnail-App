@@ -12,17 +12,14 @@ import { mainRouter } from './routes';
 const PORT = process.env.PORT || 3001
 
 
-// const __dirname = path.resolve();
-// const filePath = path.join(__dirname    );
-// console.log(filePath);
 
 
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(express.json())
 app.use(express.urlencoded({ extended:false }));
 
 app.set("view engine", "ejs")
-app.set("views", path.resolve(__dirname, "./views"))
+// app.set("views", path.resolve(__dirname, "./views"))
 
 
 
